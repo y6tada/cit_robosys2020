@@ -1,0 +1,1 @@
+cmd_/home/y6tada-home/workspace/cit_robosys2020/myled/myled.ko := ld -r -EL  -maarch64elf --build-id  -T ./scripts/module-common.lds -T ./arch/arm64/kernel/module.lds -o /home/y6tada-home/workspace/cit_robosys2020/myled/myled.ko /home/y6tada-home/workspace/cit_robosys2020/myled/myled.o /home/y6tada-home/workspace/cit_robosys2020/myled/myled.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_/home/y6tada-home/workspace/cit_robosys2020/myled/myled.mod := { echo  /home/y6tada-home/workspace/cit_robosys2020/myled/myled.o; echo; } > /home/y6tada-home/workspace/cit_robosys2020/myled/myled.mod
