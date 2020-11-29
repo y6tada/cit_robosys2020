@@ -1,1 +1,0 @@
-cmd_/home/y6tada-home/workspace/cit_robosys2020/myled/Module.symvers := sed 's/ko$$/o/' /home/y6tada-home/workspace/cit_robosys2020/myled/modules.order | scripts/mod/modpost  -a   -o /home/y6tada-home/workspace/cit_robosys2020/myled/Module.symvers -e -i Module.symvers   -T -
