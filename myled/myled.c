@@ -2,6 +2,7 @@
 #include <linux/fs.h>
 #include <linux/cdev.h>
 #include <linux/device.h>
+#include <linux/uaccess.h>
 
 MODULE_AUTHOR("Yusuke Tada and Ryuichi Ueda");
 MODULE_AUTHOR("Driver for LED control, source code originally from lecture cit_robosys2020 organized by Prof.Ryuichi Ueda");
@@ -12,15 +13,34 @@ static dev_t dev;
 static struct cdev cdv;
 static struct class *cls = NULL;
 
-static ssize_t led_write(struct file* flip, const char* buf, size_t count, loff_t * pos)
+static ssize_t led_write(struct file* filp, const char* buf, size_t count, loff_t *pos)
 {
-	printk(KERN_INFO "led_write is called.\n");
+	char c;
+	if(copy_from_user(&c, buf, sizeof(char))) {
+		return -EFAULT;
+	}
+
+	printk(KERN_INFO "recieve %c\n", c);
 	return 1;
+}
+
+static ssize_t sushi_read(struct file* filp, char* buf, size_t count, loff_t *pos)
+{
+	int size = 0;
+	char sushi[] = {0xF0, 0x9F, 0x8D, 0xA3 ,0x0A};
+	if (copy_to_user(buf+size, (const char *)sushi, sizeof(sushi))) {
+		printk(KERN_ERR "sushi: copy_to_user failed.\n");
+		return -EFAULT;
+	}
+
+	size += sizeof(sushi);
+	return size;
 }
 
 static struct file_operations led_fops = {
 	.owner = THIS_MODULE,
-	.write = led_write
+	.write = led_write,
+	.read = sushi_read
 };
 
 static int __init init_mod(void)
@@ -45,12 +65,15 @@ static int __init init_mod(void)
 		return PTR_ERR(cls);
 	}
 
+	device_create(cls, NULL, dev, NULL, "myled%d", MINOR(dev));
+
 	return 0;
 }
 
 static void __exit cleanup_mod(void)
 {
 	cdev_del(&cdv);
+	device_destroy(cls, dev);
 	class_destroy(cls);
 	unregister_chrdev_region(dev, 1);
 	printk(KERN_INFO "%s is unloaded. major:%d\n", __FILE__, MAJOR(dev));
