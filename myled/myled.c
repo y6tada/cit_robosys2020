@@ -9,7 +9,7 @@
 #define RPI_REG_BASE (0xFE200000)
 
 MODULE_AUTHOR("Yusuke Tada and Ryuichi Ueda");
-MODULE_AUTHOR("Driver for LED control, source code originally from lecture cit_robosys2020 organized by Prof.Ryuichi Ueda");
+MODULE_DESCRIPTION("Driver for LED control, source code originally from lecture cit_robosys2020 organized by Prof.Ryuichi Ueda");
 MODULE_LICENSE("GPL");
 MODULE_VERSION("0.0.1");
 
