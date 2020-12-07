@@ -13,6 +13,12 @@ MODULE_DESCRIPTION("Driver for LED control, source code originally from lecture 
 MODULE_LICENSE("GPL");
 MODULE_VERSION("0.0.1");
 
+typedef enum  {
+	published,
+	edited
+} publish_status_t;
+
+static publish_status_t publish_status = published;
 static dev_t dev;
 static struct cdev cdv;
 static struct class *cls = NULL;
@@ -29,9 +35,11 @@ static ssize_t led_write(struct file* filp, const char* buf, size_t count, loff_
 
 	if (c =='0') {
 		gpio_base[10] = 1 << 25;
+		publish_status = edited;
 	}
 	else if (c == '1') {
 		gpio_base[7] = 1 << 25;
+		publish_status = edited;
 	}
 
 	return 1;
@@ -40,13 +48,18 @@ static ssize_t led_write(struct file* filp, const char* buf, size_t count, loff_
 static ssize_t sushi_read(struct file* filp, char* buf, size_t count, loff_t *pos)
 {
 	int size = 0;
-	char sushi[] = {0xF0, 0x9F, 0x8D, 0xA3 ,0x0A};
-	if (copy_to_user(buf+size, (const char *)sushi, sizeof(sushi))) {
-		printk(KERN_ERR "sushi: copy_to_user failed.\n");
-		return -EFAULT;
+	const char msg_of_read[] = {0xF0, 0x9F, 0x8D, 0xA3 ,0x0A};
+
+	if (publish_status == edited) {
+		if (copy_to_user(buf + size, (const char *)msg_of_read, sizeof(msg_of_read))) {
+			printk(KERN_ERR "msg_of_read: copy_to_user failed.\n");
+			return -EFAULT;
+		}
+		publish_status = published;
+		printk(KERN_INFO "status changed to published.\n");
 	}
 
-	size += sizeof(sushi);
+	size += sizeof(msg_of_read);
 	return size;
 }
 
