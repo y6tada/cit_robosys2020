@@ -13,5 +13,5 @@ myled.c:75:14: error: implicit declaration of function ‘ioremap_nocache’; di
 ```
 5.8.0-1007-raspi
 ```
-仕方が無いので`ioremap_cache`でとりあえず進めた。
+仕方が無いので`ioremap()`でとりあえず進めた。
 
