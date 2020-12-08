@@ -1,4 +1,10 @@
-/* mbed Microcontroller Library
+/* 
+ * main.cpp
+ * Remote controll recieve, log, and emit.
+ *
+ * Copyright (C) 2020 Yusuke Tada all right reserved.
+ * 
+ * mbed Microcontroller Library
  * Copyright (c) 2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  */
