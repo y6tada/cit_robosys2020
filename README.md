@@ -2,6 +2,9 @@
 CITロボットシステム学 講義用リポジトリ  
 Original lecture: [ryuichiueda/robosys2020](https://github.com/ryuichiueda/robosys2020)
 
+## Video
+[![](https://img.youtube.com/vi/n9D5KT2ge2s/0.jpg)](https://www.youtube.com/watch?v=n9D5KT2ge2s)
+
 ## 説明
 家電の遠隔操作に使われるIRリモコンの信号読み取りと吐き出しをして、家電のリモコン操作をRasPiから行えるようにする。
 IRリモコンの信号は38〜40kHzで変調された信号にパルスの信号をかぶせてあるので、PWMで変調を行い、信号はPWMの吐き出しタイミングを制御すること行う。
