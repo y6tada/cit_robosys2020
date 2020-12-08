@@ -2,10 +2,12 @@
 CITロボットシステム学 講義用リポジトリ
 
 ## 実行とログ確認
-カーネルモジュールのインストール	
+カーネルモジュールのインストール
+
 1. `myled/`下で`make`
 1. `sudo insmod myled.ko`
 1. `sudo chmod 666 /dev/myled`
+
 デバイスに文字列`'1'`を渡す
 ```
 echo 1 > /dev/myled
