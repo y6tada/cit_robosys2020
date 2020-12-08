@@ -1,5 +1,23 @@
 # cit_robosys2020
-#CITロボットシステム学 講義用リポジトリ
+CITロボットシステム学 講義用リポジトリ
+
+## 実行とログ確認
+カーネルモジュールのインストール	
+1. `myled/`下で`make`
+1. `sudo insmod myled.ko`
+1. `sudo chmod 666 /dev/myled`
+デバイスに文字列`'1'`を渡す
+```
+echo 1 > /dev/myled
+```
+デバイスが`copy_to_user`している文字を読む
+```
+cat /dev/myled
+```
+デバイスが`printk`したログを閲覧する
+```
+tail /var/log/kern.log
+```
 
 ## 引っかかったところ
 以下エラーが出る。
