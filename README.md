@@ -1,5 +1,6 @@
 # cit_robosys2020
-CITロボットシステム学 講義用リポジトリ
+CITロボットシステム学 講義用リポジトリ  
+[ryuichiueda/robosys2020](https://github.com/ryuichiueda/robosys2020)
 
 ## 実行とログ確認
 カーネルモジュールのインストール
