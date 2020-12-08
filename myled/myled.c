@@ -4,12 +4,13 @@
 #include <linux/device.h>
 #include <linux/uaccess.h>
 #include <linux/io.h>
+#include <linux/hrtimer.h>
 
 // Raspberry pi 4
 #define RPI_REG_BASE (0xFE200000)
 
 MODULE_AUTHOR("Yusuke Tada and Ryuichi Ueda");
-MODULE_DESCRIPTION("Driver for LED control, source code originally from lecture cit_robosys2020 organized by Prof.Ryuichi Ueda");
+MODULE_DESCRIPTION("Driver for LED control");
 MODULE_LICENSE("GPL");
 MODULE_VERSION("0.0.1");
 
@@ -18,13 +19,57 @@ typedef enum  {
 	edited
 } publish_status_t;
 
+typedef enum {
+	on,
+	off,
+	pulse
+} gpio_status_t;
+
 static publish_status_t publish_status = published;
 static dev_t dev;
 static struct cdev cdv;
-static struct class *cls = NULL;
-static volatile u32 *gpio_base = NULL;
+static struct class *cls 		= NULL;
+static volatile u32 *gpio_base 	= NULL;
+/* Timer */
+static struct hrtimer timer;
 
-static ssize_t led_write(struct file* filp, const char* buf, size_t count, loff_t *pos)
+static enum hrtimer_restart timer_handler(struct hrtimer *_timer)
+{
+	gpio_base[10] = 1 << 25;
+	return HRTIMER_NORESTART;
+}
+
+static void timer_set_handler(unsigned long time_s, unsigned long time_ns)
+{
+    hrtimer_init(&timer, CLOCK_REALTIME, HRTIMER_MODE_REL);
+    timer.function = timer_handler;
+    hrtimer_start(&timer, ktime_set(time_s, time_ns), HRTIMER_MODE_REL);
+}
+
+void gpio_set(gpio_status_t _order)
+{
+	publish_status = edited;
+	switch (_order) {
+		case on:
+		gpio_base[7] = 1 << 25;
+		break;
+
+		case off:
+		gpio_base[10] = 1 << 25;
+		break;
+
+		case pulse:
+		gpio_base[7] = 1 << 25;
+		timer_set_handler(0, 200000000);
+		break;
+
+		default:
+		publish_status = published;
+		break;
+	}
+}
+
+static ssize_t mcu_sigsend(struct file* filp, const char* buf, size_t count, loff_t *pos)
 {
 	char c;
 	if(copy_from_user(&c, buf, sizeof(char))) {
@@ -33,13 +78,21 @@ static ssize_t led_write(struct file* filp, const char* buf, size_t count, loff_
 
 	// printk(KERN_INFO "recieve %c\n", c);
 
-	if (c =='0') {
-		gpio_base[10] = 1 << 25;
-		publish_status = edited;
-	}
-	else if (c == '1') {
-		gpio_base[7] = 1 << 25;
-		publish_status = edited;
+	switch (c) {
+		case '0':
+		gpio_set(off);
+		break;
+
+		case '1':
+		gpio_set(on);
+		break;
+
+		case 'p':
+		gpio_set(pulse);
+		break;
+
+		default:
+		break;
 	}
 
 	return 1;
@@ -65,8 +118,8 @@ static ssize_t sushi_read(struct file* filp, char* buf, size_t count, loff_t *po
 
 static struct file_operations led_fops = {
 	.owner = THIS_MODULE,
-	.write = led_write,
-	.read = sushi_read
+	.write = mcu_sigsend,
+	.read  = sushi_read
 };
 
 static int __init init_mod(void)

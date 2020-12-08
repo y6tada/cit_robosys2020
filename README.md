@@ -23,7 +23,7 @@ tail /var/log/kern.log
 ```
 
 ## 引っかかったところ
-以下エラーが出る。
+### 関数`ioremap_nocache()`がない
 ```
 myled.c:75:14: error: implicit declaration of function ‘ioremap_nocache’; did you mean ‘ioremap_cache’? [-Werror=implicit-function-declaration]
    75 |  gpio_base = ioremap_nocache(RPI_REG_BASE, 0xA0);
@@ -35,5 +35,14 @@ myled.c:75:14: error: implicit declaration of function ‘ioremap_nocache’; di
 ```
 5.8.0-1007-raspi
 ```
-仕方が無いので`ioremap()`でとりあえず進めた。
+仕方が無いので`ioremap()`でとりあえず進めた。i
+### `linux/hrtimer`のタイマーハンドラの戻り値
+`myled.c`の`static enum hrtimer_restart timer_handler(struct hrtimer *_timer)`は以下で定義されるenumの戻り値を返すが、これに引数を指定しないOR`HRTIMER_RESTART`を返すと暴走する。
+```
+enum hrtimer_restart {
+	HRTIMER_NORESTART,	/* Timer is not restarted */
+	HRTIMER_RESTART,	/* Timer must be restarted */
+};
+```
+
 
